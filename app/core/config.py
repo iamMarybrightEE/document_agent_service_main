@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Directory that contains the `app` package (meeting_agent_service root), not process cwd.
@@ -32,6 +32,18 @@ class Settings(BaseSettings):
     default_top_k: int = 4
     chunk_size: int = 1200
     chunk_overlap: int = 150
+
+    @field_validator("max_upload_mb", "max_top_k", "default_top_k", "chunk_size", "chunk_overlap", "port", mode="before")
+    @classmethod
+    def strip_quotes_from_ints(cls, v):
+        """Strip surrounding quotes from string values before parsing as integers.
+        
+        This handles environment variables that come with literal quotes like '"50"'.
+        This can happen in some deployment platforms like back4app.
+        """
+        if isinstance(v, str):
+            v = v.strip().strip('"').strip("'")
+        return v
 
     @model_validator(mode="after")
     def resolve_paths_under_service_root(self) -> "Settings":
