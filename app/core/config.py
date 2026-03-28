@@ -45,6 +45,20 @@ class Settings(BaseSettings):
             v = v.strip().strip('"').strip("'")
         return v
 
+    @field_validator(
+        "env", "api_prefix", "database_url", "redis_url", "storage_dir", "chroma_persist_root",
+        "openai_api_key", "openai_chat_model", "openai_embed_model", "jwt_secret", "jwt_algorithm", "auth_mode", mode="before"
+    )
+    @classmethod
+    def strip_quotes_from_strings(cls, v):
+        """Strip surrounding quotes from string env vars.
+        
+        Handles environment variables wrapped with literal quotes like '"dev"'.
+        """
+        if isinstance(v, str):
+            v = v.strip().strip('"').strip("'")
+        return v
+
     @model_validator(mode="after")
     def resolve_paths_under_service_root(self) -> "Settings":
         """Anchor SQLite DB and storage to this service folder so uvicorn cwd does not break writes."""
