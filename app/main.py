@@ -53,6 +53,11 @@ async def startup_event():
         print(f"Warning: Could not initialize database on startup: {e}")
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"message": "Document Agent Service is running"}
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
