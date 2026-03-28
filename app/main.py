@@ -33,12 +33,6 @@ from app.services import (
 )
 from app.models.entities import IndexStatus
 
-try:
-    Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(f"Warning: Could not initialize database on startup: {e}")
-    pass
-
 app = FastAPI(title="Document Agent Service", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
@@ -47,6 +41,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on app startup."""
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("Database initialized successfully")
+    except Exception as e:
+        print(f"Warning: Could not initialize database on startup: {e}")
 
 
 @app.get("/health")
