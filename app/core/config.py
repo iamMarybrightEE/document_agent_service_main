@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-secret"
     jwt_algorithm: str = "HS256"
     auth_mode: str = "strict"
-    max_upload_mb: int = 50
+    max_upload_mb: int = 1
     max_top_k: int = 8
     default_top_k: int = 4
     chunk_size: int = 1200
